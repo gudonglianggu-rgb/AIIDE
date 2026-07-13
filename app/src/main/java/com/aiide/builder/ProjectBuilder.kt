@@ -1,94 +1,74 @@
 package com.aiide.builder
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.*
-import android.widget.*
 import java.io.File
 
-class ProjectBuilder(private val context: Context, private val projectDir: String) {
-    private lateinit var outputView: TextView
-    private lateinit var buildBtn: Button
-    private var isBuilding = false
+class ProjectBuilder(private val context: Context) {
 
-    fun buildView(): View {
-        val layout = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            setPadding(16,16,16,16)
-        }
-        layout.addView(TextView(context).apply { text = "🔧 项目打包工具"; textSize = 18f; setTextColor(0xFFFFFFFF.toInt()) })
-
-        val btnRow = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
-        buildBtn = Button(context).apply { text = "▶ 打包项目"; setOnClickListener { buildProject() } }
-        btnRow.addView(buildBtn)
-        btnRow.addView(Button(context).apply { text = "🧹 清理"; setOnClickListener { cleanBuild() } })
-        btnRow.addView(Button(context).apply { text = "📲 安装APK"; setOnClickListener { installApk() } })
-        layout.addView(btnRow)
-
-        layout.addView(TextView(context).apply { text = "构建输出:"; setTextColor(0xFFAAAAAA.toId()); setPadding(0,8,0,4) })
-
-        val scroll = ScrollView(context).apply { layoutParams = LinearLayout.LayoutParams(-1, 0, 1f) }
-        outputView = TextView(context).apply {
-            textSize = 11f; typeface = android.graphics.Typeface.MONOSPACE
-            setTextColor(0xFF00FF00.toInt()); setBackgroundColor(0xFF1A1A1A.toInt()); setPadding(8,8,8,8)
-        }
-        scroll.addView(outputView)
-        layout.addView(scroll)
-
-        layout.addView(TextView(context).apply {
-            text = "\n内置打包工具:\n• Python PyInstaller\n• Node.js pkg\n• Android Gradle\n• ZIP压缩\n• Shell tar/gzip"
-            textSize = 13f; setTextColor(0xFF888888.toInt())
-        })
-        return layout
+    fun buildAndroid(projectPath: String): String {
+        return try {
+            val projectDir = File(projectPath)
+            if (!projectDir.exists()) return "❌ 项目目录不存在: $projectPath"
+            val gradlew = File(projectDir, "gradlew")
+            if (!gradlew.exists()) return "⚠️ 缺少 gradlew，请生成 wrapper"
+            val p = ProcessBuilder("./gradlew", "assembleDebug", "--no-daemon", "--quiet")
+                .directory(projectDir).redirectErrorStream(true).start()
+            val o = p.inputStream.bufferedReader().readText()
+            if (p.waitFor() == 0) "✅ Android APK 打包成功!\n$o"
+            else "❌ 编译失败:\n$o"
+        } catch (e: Exception) { "❌ Android 打包异常: ${e.message}" }
     }
 
-    private fun log(msg: String) { outputView.append("$msg\n") }
+    fun buildNpm(projectPath: String): String {
+        return try {
+            val projectDir = File(projectPath)
+            if (!projectDir.exists()) return "❌ 项目目录不存在: $projectPath"
+            if (!File(projectDir, "package.json").exists()) return "⚠️ 不是 npm 项目"
+            val s = mutableListOf("📦 npm 项目")
+            val i = ProcessBuilder("npm", "install").directory(projectDir).redirectErrorStream(true).start()
+            val io = i.inputStream.bufferedReader().readText()
+            if (i.waitFor() != 0) return "❌ npm install 失败:\n$io"
+            s.add("✅ 依赖安装完成")
+            if (File(projectDir, "package.json").readText().contains("\"build\"")) {
+                val b = ProcessBuilder("npm", "run", "build").directory(projectDir).redirectErrorStream(true).start()
+                val bo = b.inputStream.bufferedReader().readText()
+                s.add(if (b.waitFor() == 0) "✅ build 成功" else "❌ build 失败:\n$bo")
+            }
+            s.joinToString("\n")
+        } catch (e: Exception) { "❌ npm 异常: ${e.message}" }
+    }
 
-    private fun buildProject() {
-        if (isBuilding) return; isBuilding = true; buildBtn.isEnabled = false; outputView.text = ""
-        log("🚀 开始构建项目...")
-        Thread {
-            try {
-                val project = File(projectDir)
-                val hasGradle = project.walkTopDown().any { it.name == "build.gradle.kts" || it.name == "build.gradle" }
-                val hasPy = project.walkTopDown().any { it.extension == "py" && it.name != "__init__.py" }
-                val hasPkgJson = File(project, "package.json").exists()
-                when {
-                    hasGradle -> log("📱 Android Gradle项目\n⚠️ 需要Android SDK\n💡 使用命令: gradle assembleDebug")
-                    hasPkgJson -> { log("⬡ Node.js项目"); runCmd(arrayOf("npm","pack"), project) }
-                    hasPy -> { log("🐍 Python项目"); val main = project.walkTopDown().firstOrNull { it.name == "main.py" || it.name == "app.py" }; if (main != null) runCmd(arrayOf("python3","-m","zipapp",main.name,"-o","${project.name}.pyz"), project) else log("⚠️ 未找到main.py/app.py") }
-                    else -> { log("📦 创建ZIP归档..."); runCmd(arrayOf("zip","-r","${project.name}.zip","."), project) }
+    fun buildPython(projectPath: String): String {
+        return try {
+            val d = File(projectPath)
+            if (!d.exists()) return "❌ 项目目录不存在: $projectPath"
+            val s = mutableListOf("🐍 Python 项目")
+            when {
+                File(d, "setup.py").exists() -> {
+                    val p = ProcessBuilder("python3", "setup.py", "sdist").directory(d).redirectErrorStream(true).start()
+                    s.add(if (p.waitFor() == 0) "✅ sdist 构建成功" else "❌ 失败:\n${p.inputStream.bufferedReader().readText()}")
                 }
-                log("✅ 构建完成")
-            } catch (e: Exception) { log("❌ 构建失败: ${e.message}") }
-            finally { isBuilding = false; Handler(Looper.getMainLooper()).post { buildBtn.isEnabled = true } }
-        }.start()
+                File(d, "pyproject.toml").exists() -> {
+                    val p = ProcessBuilder("python3", "-m", "build", "--sdist").directory(d).redirectErrorStream(true).start()
+                    s.add(if (p.waitFor() == 0) "✅ build 成功" else "❌ 失败:\n${p.inputStream.bufferedReader().readText()}")
+                }
+                else -> s.add("⚠️ 未检测到标准项目结构")
+            }
+            s.joinToString("\n")
+        } catch (e: Exception) { "❌ Python 异常: ${e.message}" }
     }
 
-    private fun runCmd(cmd: Array<String>, dir: File) {
-        try {
-            val p = ProcessBuilder(*cmd).directory(dir).redirectErrorStream(true).start()
-            p.inputStream.bufferedReader().forEachLine { log(it) }
-            p.waitFor()
-        } catch (e: Exception) { log("❌ 执行失败: ${e.message}") }
-    }
-
-    private fun cleanBuild() {
-        outputView.text = ""; log("🧹 清理构建缓存...")
-        for (d in listOf("build","dist","__pycache__",".gradle","node_modules")) {
-            val f = File(projectDir, d)
-            if (f.exists()) { f.deleteRecursively(); log("  删除: $d") }
-        }
-        log("✅ 清理完成")
-    }
-
-    private fun installApk() {
-        val apks = File(projectDir).walkTopDown().filter { it.extension == "apk" }.toList()
-        if (apks.isEmpty()) { log("⚠️ 未找到APK"); return }
-        log("📲 安装: ${apks.last().name}")
-        try { ProcessBuilder("pm","install","-r",apks.last().absolutePath).redirectErrorStream(true).start().inputStream.bufferedReader().forEachLine { log(it) } }
-        catch (e: Exception) { log("❌ 安装失败: ${e.message}") }
+    fun buildZip(projectPath: String): String {
+        return try {
+            val d = File(projectPath)
+            if (!d.exists()) return "❌ 项目目录不存在: $projectPath"
+            val zf = File(d.parentFile, "${d.name}.zip")
+            val p = ProcessBuilder("zip", "-r", zf.absolutePath, ".",
+                "-x", "*.git*", "-x", "node_modules/*", "-x", ".gradle/*")
+                .directory(d).redirectErrorStream(true).start()
+            val o = p.inputStream.bufferedReader().readText()
+            if (p.waitFor() == 0) "✅ ZIP 打包成功!\n📦 ${zf.absolutePath}\n📏 ${String.format("%.1f", zf.length() / 1024.0 / 1024.0)} MB"
+            else "❌ ZIP 失败:\n$o"
+        } catch (e: Exception) { "❌ ZIP 异常: ${e.message}" }
     }
 }
