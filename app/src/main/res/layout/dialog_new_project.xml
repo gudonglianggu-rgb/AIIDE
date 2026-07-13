@@ -11,7 +11,7 @@
         android:hint="项目名称">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/project_name_input"
+            android:id="@+id/et_project_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text" />
@@ -24,7 +24,7 @@
         android:hint="项目路径">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/project_path_input"
+            android:id="@+id/et_project_path"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text" />
@@ -38,6 +38,7 @@
         android:textSize="14sp" />
 
     <RadioGroup
+        android:id="@+id/type_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

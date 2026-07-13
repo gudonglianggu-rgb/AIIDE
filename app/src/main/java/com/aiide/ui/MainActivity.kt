@@ -19,8 +19,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.view.LayoutInflater
 import android.widget.EditText
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.chip.Chip
+import android.widget.RadioGroup
 import java.io.File
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -122,8 +121,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_new_project, null)
         val nameInput = dialogView.findViewById<EditText>(R.id.et_project_name)
         val pathInput = dialogView.findViewById<EditText>(R.id.et_project_path)
-        val chipGroup = dialogView.findViewById<ChipGroup>(R.id.chip_project_type)
-
+        val radioGroup = dialogView.findViewById<RadioGroup>(R.id.type_group)
+        // dialog_new_project.xml 使用 RadioGroup + RadioButton，所以直接按选中 Button 取文字
         pathInput.setText(currentProjectPath)
 
         MaterialAlertDialogBuilder(this)
@@ -132,10 +131,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setPositiveButton("创建") { _, _ ->
                 val name = nameInput.text.toString().trim()
                 val basePath = pathInput.text.toString().trim()
-                val selectedChipId = chipGroup.checkedChipId
-                val type = if (selectedChipId != -1) {
-                    dialogView.findViewById<Chip>(selectedChipId)?.text?.toString() ?: "Android"
-                } else "Android"
+                val selectedId = radioGroup.checkedRadioButtonId
+                val type = if (selectedId != -1) {
+                    dialogView.findViewById<android.widget.RadioButton>(selectedId)?.text?.toString() ?: "空项目"
+                } else "空项目"
 
                 if (name.isEmpty()) {
                     Toast.makeText(this, "请输入项目名称", Toast.LENGTH_SHORT).show()

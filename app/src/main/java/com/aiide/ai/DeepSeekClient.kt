@@ -1,5 +1,6 @@
 package com.aiide.ai
 
+import android.content.Context
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -8,7 +9,8 @@ import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class DeepSeekClient(private val config: AIConfig) {
+class DeepSeekClient(context: Context) {
+    val config: AIConfig = AIConfig.load(context.filesDir.absolutePath)
     private val client = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(120, TimeUnit.SECONDS)
