@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // 初始化 DeepSeek Client
         deepSeekClient = DeepSeekClient(this)
         projectBuilder = ProjectBuilder(this)
-        fileBrowser = FileBrowser(this)
+        fileBrowser = FileBrowser(this, filesDir.absolutePath)
 
         // Toggle
         val toggle = ActionBarDrawerToggle(
@@ -167,8 +167,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun showAIConfigDialog() {
         val config = deepSeekClient.config
         val items = arrayOf(
-            "API Key: ${config.apiKey.take(8)}...",
-            "Base URL: ${config.baseUrl}",
+            "API Key: ${config.api_key.take(8)}...",
+            "Base URL: ${config.base_url}",
             "Model: ${config.model}"
         )
         MaterialAlertDialogBuilder(this)

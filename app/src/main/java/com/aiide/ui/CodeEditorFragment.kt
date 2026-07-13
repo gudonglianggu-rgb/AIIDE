@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.aiide.R
 import com.google.android.material.button.MaterialButton
 import java.io.File
 

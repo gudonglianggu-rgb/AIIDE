@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.aiide.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aiide.filemanager.FileBrowser
@@ -33,7 +34,7 @@ class FileBrowserFragment : Fragment() {
         btnGoUp = view.findViewById(R.id.btn_go_up)
         btnRefresh = view.findViewById(R.id.btn_refresh)
 
-        fileBrowser = FileBrowser(requireContext())
+        fileBrowser = FileBrowser(requireContext(), "/")
 
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -101,7 +102,7 @@ class FileListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val file = files[position]
-        val icon = if (file.isDirectory) "📁 " else FileBrowser.getFileIcon(file.name)
+        val icon = if (file.isDirectory) "📁 " else when (file.extension.lowercase()) { "kt","kts"->"🔷 "; "java"->"☕ "; "py"->"🐍 "; "js","ts"->"🟨 "; "html"->"🌐 "; "css"->"🎨 "; "xml"->"📋 "; "json"->"📊 "; "md"->"📝 "; "txt"->"📄 "; "sh","bash"->"⚡ "; "gradle"->"🛠️ "; "apk"->"📦 "; "zip"->"🗜️ "; else->"📄 " }
         holder.textView.text = "$icon${file.name}"
         holder.itemView.setOnClickListener { onItemClick(file) }
     }

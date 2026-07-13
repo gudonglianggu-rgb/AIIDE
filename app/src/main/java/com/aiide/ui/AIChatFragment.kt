@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.aiide.R
 import com.aiide.ai.DeepSeekClient
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -92,15 +93,17 @@ class AIChatFragment : Fragment() {
                     mapOf("role" to "system", "content" to systemPrompt),
                     mapOf("role" to "user", "content" to prompt)
                 )
-
-                val result = withContext(Dispatchers.IO) {
-                    deepSeekClient.sendMessage(messages)
+                withContext(Dispatchers.IO) {
+                    val chatMessages = messages.map { DeepSeekClient.ChatMessage(role = it["role"] ?: "user", content = it["content"] ?: "") }
+                    val response = deepSeekClient.chat(chatMessages) { /* streaming 不需要实时显示 */ }
+                    withContext(Dispatchers.Main) {
+                        val lastIndex = chatHistory.lastIndexOf("思考中...")
+                        if (lastIndex != -1) {
+                            chatHistory.replace(lastIndex, lastIndex + 5, "")
+                        }
+                        appendMessage("AI", response.content)
+                    }
                 }
-
-                // 更新界面
-                val lastIndex = chatHistory.lastIndexOf("思考中...")
-                if (lastIndex != -1) {
-                    chatHistory.replace(lastIndex, lastIndex + 5, "")
                 }
                 appendMessage("AI", result)
             } catch (e: Exception) {
