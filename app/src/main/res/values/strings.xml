@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI编程助手</string>
+    <string name="ai_panel_title">DeepSeek AI</string>
+    <string name="file_explorer">文件浏览器</string>
+    <string name="settings">设置</string>
+    <string name="build">打包</string>
+    <string name="send">发送</string>
+    <string name="input_hint">输入你的需求，AI直接帮你改代码...</string>
+</resources>

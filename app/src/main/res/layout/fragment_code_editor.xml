@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_file_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="文件名或路径"
+            android:textColor="?android:attr/textColorPrimary"
+            android:background="@drawable/edit_text_bg"
+            android:padding="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_open_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="打开"
+            android:layout_marginStart="4dp"
+            style="@style/Widget.Material3.Button.Tonal" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保存"
+            android:layout_marginStart="4dp"
+            style="@style/Widget.Material3.Button" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/et_code_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:gravity="start|top"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:fontFamily="monospace"
+        android:textSize="12sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:background="@drawable/edit_text_bg"
+        android:padding="8dp"
+        android:scrollbars="vertical" />
+</LinearLayout>
