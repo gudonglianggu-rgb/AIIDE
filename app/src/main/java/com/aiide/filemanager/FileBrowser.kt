@@ -42,7 +42,7 @@ class FileBrowser(private val context: Context, private var rootDir: String) {
         pathLabel.text = currentDir.absolutePath
         val items = mutableListOf<FileItem>()
         if (currentDir.parentFile != null) items.add(FileItem("..", true, currentDir.parentFile!!))
-        val files = currentDir.listFiles()?.sortedWith(compareBy<File, Boolean>({ !it.isDirectory }, { it.name.lowercase() })) ?: emptyArray()
+        val files = currentDir.listFiles()?.sortedBy { !it.isDirectory }?.sortedBy { it.name.lowercase() }?.toTypedArray() ?: emptyArray()
         for (f in files) items.add(FileItem(f.name, f.isDirectory, f))
         listView.adapter = FileAdapter(context, items)
         listView.setOnItemClickListener { _, _, pos, _ ->

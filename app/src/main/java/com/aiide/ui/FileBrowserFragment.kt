@@ -67,7 +67,7 @@ class FileBrowserFragment : Fragment() {
             return
         }
 
-        val files = dir.listFiles()?.sortedWith(compareBy({ !it.isDirectory }, { it.name })) ?: emptyArray()
+        val files = dir.listFiles()?.sortedBy { !it.isDirectory }?.sortedBy { it.name }?.toTypedArray() ?: emptyArray()
         val adapter = FileListAdapter(files) { file ->
             if (file.isDirectory) {
                 loadDirectory(file.absolutePath)

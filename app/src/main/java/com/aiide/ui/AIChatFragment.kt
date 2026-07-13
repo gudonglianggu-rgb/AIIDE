@@ -73,7 +73,6 @@ class AIChatFragment : Fragment() {
 
         scope.launch {
             try {
-                // 构建系统Prompt，包含项目路径信息
                 val systemPrompt = buildString {
                     append("你是一个AI编程助手。用户正在使用AIIDE手机端编程应用。")
                     append("\n当前项目路径: $currentProjectPath")
@@ -93,19 +92,15 @@ class AIChatFragment : Fragment() {
                     mapOf("role" to "system", "content" to systemPrompt),
                     mapOf("role" to "user", "content" to prompt)
                 )
-                withContext(Dispatchers.IO) {
+                val response = withContext(Dispatchers.IO) {
                     val chatMessages = messages.map { DeepSeekClient.ChatMessage(role = it["role"] ?: "user", content = it["content"] ?: "") }
-                    val response = deepSeekClient.chat(chatMessages) { /* streaming 不需要实时显示 */ }
-                    withContext(Dispatchers.Main) {
-                        val lastIndex = chatHistory.lastIndexOf("思考中...")
-                        if (lastIndex != -1) {
-                            chatHistory.replace(lastIndex, lastIndex + 5, "")
-                        }
-                        appendMessage("AI", response.content)
-                    }
+                    deepSeekClient.chat(chatMessages) { /* streaming 不需要实时显示 */ }
                 }
+                val lastIndex = chatHistory.lastIndexOf("思考中...")
+                if (lastIndex != -1) {
+                    chatHistory.replace(lastIndex, lastIndex + 5, "")
                 }
-                appendMessage("AI", result)
+                appendMessage("AI", response.content)
             } catch (e: Exception) {
                 val lastIndex = chatHistory.lastIndexOf("思考中...")
                 if (lastIndex != -1) {
