@@ -9,4 +9,6 @@
     <color name="text_primary">#FFD4D4D4</color>
     <color name="text_secondary">#FF888888</color>
     <color name="accent">#FF4FC3F7</color>
+    <color name="ic_launcher_background">#FF1E1E1E</color>
+    <color name="ic_launcher_foreground">#FF4FC3F7</color>
 </resources>

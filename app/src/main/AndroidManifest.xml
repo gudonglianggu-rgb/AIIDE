@@ -11,7 +11,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher_legacy"
         android:label="AI编程助手"
         android:supportsRtl="true"
         android:theme="@style/Theme.AIIDE"
@@ -20,7 +20,7 @@
         tools:targetApi="31">
         
         <activity
-            android:name=".MainActivity"
+            android:name="com.aiide.ui.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -29,7 +29,6 @@
             </intent-filter>
         </activity>
         
-        <!-- 文件提供器 -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
