@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:text="打开"
             android:layout_marginStart="4dp"
-            style="@style/Widget.Material3.Button.Tonal" />
+            style="@style/Widget.Material3.Button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_save_file"

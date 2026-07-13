@@ -49,6 +49,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="清空"
-            style="@style/Widget.Material3.Button.Tonal" />
+            style="@style/Widget.Material3.Button" />
     </LinearLayout>
 </LinearLayout>
