@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val tabTitles = listOf("编辑器", "AI 助手", "打包", "文件")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_AIIDE)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

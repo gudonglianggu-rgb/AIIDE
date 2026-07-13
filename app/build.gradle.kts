@@ -53,6 +53,12 @@ dependencies {
     // 协程
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     
+    // ViewPager2 (配合 TabLayout)
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
     // 文件浏览
     implementation("androidx.documentfile:documentfile:1.0.1")
+
+    // 协程生命周期集成
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }
